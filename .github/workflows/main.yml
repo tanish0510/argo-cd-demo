@@ -60,7 +60,6 @@ jobs:
       # UPdate the K8s Manifest Files
       - name: Update K8s Manifests
         run: |
-          cat deploy/deploy.yaml
           sed -i "s|image: tanish0510/demo-app:.*|image: tanish0510/demo-app:${{ env.VERSION }}|g" deploy/deploy.yaml
           cat deploy/deploy.yaml
 
