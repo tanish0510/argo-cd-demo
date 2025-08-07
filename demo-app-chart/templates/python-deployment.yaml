@@ -1,35 +1,35 @@
-# demo-app-chart/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "demo-app-chart.fullname" . }} # A helper to create a unique name
+  name: {{ include "demo-app-chart.fullname" . }}-python-cluster
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.python.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "demo-app-chart.name" . }}
+      app: {{ include "demo-app-chart.name" . }}-python
   template:
     metadata:
       labels:
-        app: {{ include "demo-app-chart.name" . }}
+        app: {{ include "demo-app-chart.name" . }}-python
     spec:
       containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      - name: python-container
+        image: "{{ .Values.python.image.repository }}:{{ .Values.python.image.tag }}"
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - containerPort: {{ .Values.python.service.targetPort }}
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "demo-app-chart.fullname" . }}-service
+  name: {{ include "demo-app-chart.fullname" . }}-python-cluster-service
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.python.service.type }}
   selector:
-    app: {{ include "demo-app-chart.name" . }}
+    app: {{ include "demo-app-chart.name" . }}-python
   ports:
     - protocol: TCP
-      port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      nodePort: {{ .Values.service.nodePort }}
-
+      port: {{ .Values.python.service.port }}
+      targetPort: {{ .Values.python.service.targetPort }}
+      nodePort: {{ .Values.python.service.nodePort }}

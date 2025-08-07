@@ -1,18 +1,23 @@
-# demo-app-chart/values.yaml
+# Values for the Python application
 python:
   replicaCount: 2
   image:
     repository: tanish0510/demo-app
-    tag: v20250807100443
+    tag: v20250807043513
+
   service:
     type: NodePort
     port: 5000
     targetPort: 5000
     nodePort: 30008
 
+# Values for the Redis database
 redis:
   replicaCount: 1
   image:
     repository: redis
     tag: v20250807100443
+  service:
+    port: 6379
+    targetPort: 6379
 
