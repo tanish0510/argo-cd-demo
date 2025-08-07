@@ -3,7 +3,7 @@ replicaCount: 2
 
 image:
   repository: tanish0510/demo-app
-  tag: v20250807092814
+  tag: v20250807093345
   pullPolicy: IfNotPresent
 
 service:
