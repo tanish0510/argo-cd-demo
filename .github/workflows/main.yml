@@ -12,10 +12,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    #Setting up environment
+    # Setting up environment
       - name: Checkout code
         uses: actions/checkout@v2
-
+      
+      - name: Checkout Helm Chart repository
+        uses: actions/checkout@v2
+        with:
+          repository: tanish0510/argo-cd-demo 
+          path: .
+          
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -30,7 +36,6 @@ jobs:
           pip install -r requirements.txt
           pip install flake8
           
-      # Test the Code
       - name: Run Linting tests
         run: |
           flake8 --ignore=E501,F401 .
@@ -47,35 +52,26 @@ jobs:
           VERSION=v$(date +"%Y%m%d%H%M%S")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      # Build the Docker Image
       - name: Build Docker Image
         run: |
           docker build . -t tanish0510/demo-app:${{ env.VERSION }} 
-      
-      # Push the Docker Image
+    
       - name: Push Docker Image
         run: |
           docker push tanish0510/demo-app:${{ env.VERSION }}
       
-      # UPdate the K8s Manifest Files
-      - name: Update K8s Manifests
+    # This is the critical change for the GitOps workflow
+      - name: Update Helm Chart values
         run: |
-          sed -i "s|image: tanish0510/demo-app:.*|image: tanish0510/demo-app:${{ env.VERSION }}|g" deploy/deploy.yaml
-          cat deploy/deploy.yaml
-
-      # Update Github
+          # Use 'sed' to replace the 'tag' in your values.yaml file
+          sed -i "s|tag: .*|tag: ${{ env.VERSION }}|g" demo-app-chart/values.yaml
+          cat demo-app-chart/values.yaml
+          
       - name: Commit the changes
         run: |
           git config --global user.email "<>"
           git config --global user.name "GitHub Actions Bot"
-          git add deploy/deploy.yaml
-          git commit -m "Update deploy.yaml with new image version - ${{ env.VERSION }}"
+          git add demo-app-chart/values.yaml
+          git commit -m "Update Helm chart with new image version - ${{ env.VERSION }}"
           git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/tanish0510/argo-cd-demo.git
           git push origin main
-
-      
-
-
-        
-      
-
