@@ -3,7 +3,7 @@ python:
   replicaCount: 2
   image:
     repository: tanish0510/demo-app
-    tag: v20250807103159
+    tag: v20250807105733
 
   service:
     type: NodePort
@@ -16,7 +16,7 @@ redis:
   replicaCount: 1
   image:
     repository: redis
-    tag: v20250807103159
+    tag: v20250807105733
   service:
     port: 6379
     targetPort: 6379
