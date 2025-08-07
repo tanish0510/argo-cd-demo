@@ -1,14 +1,18 @@
 # demo-app-chart/values.yaml
-replicaCount: 2
+python:
+  replicaCount: 2
+  image:
+    repository: tanish0510/demo-app
+    tag: v20250807043513
+  service:
+    type: NodePort
+    port: 5000
+    targetPort: 5000
+    nodePort: 30008
 
-image:
-  repository: tanish0510/demo-app
-  tag: v20250807095444
-  pullPolicy: IfNotPresent
-
-service:
-  type: NodePort
-  port: 5000
-  targetPort: 5000
-  nodePort: 30008
+redis:
+  replicaCount: 1
+  image:
+    repository: redis
+    tag: "latest"
 
