@@ -3,21 +3,18 @@ python:
   replicaCount: 2
   image:
     repository: tanish0510/demo-app
-    tag: v20250808111002
-
+    tag: v20250808112716
   service:
     type: NodePort
     port: 5000
     targetPort: 5000
     nodePort: 30008
-
 # Values for the Redis database
 redis:
   replicaCount: 1
   image:
     repository: redis
-    tag: latest
+    tag: v20250808112716
   service:
     port: 6379
     targetPort: 6379
-
