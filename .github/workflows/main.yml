@@ -59,13 +59,6 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push tanish0510/demo-app:${{ env.VERSION }}
-      
-    # This is the critical change for the GitOps workflow
-      - name: Update Helm Chart values
-        run: |
-          # Use 'sed' to replace the 'tag' in your values.yaml file
-          sed -i "s|tag: .*|tag: ${{ env.VERSION }}|g" demo-app-chart/values.yaml
-          cat demo-app-chart/values.yaml
           
       - name: Commit the changes
         run: |
