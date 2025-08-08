@@ -81,7 +81,8 @@ jobs:
           # Update Helm chart values.yaml
           yq e '.python.image.tag = "${{ env.VERSION }}"' -i helm-repo/demo-app-chart/values.yaml
           
-          cd helm-repo
+      - name: Commit the changes
+        run: |
           git config --global user.email "<>"
           git config --global user.name "GitHub Actions Bot"
           git add demo-app-chart/values.yaml
