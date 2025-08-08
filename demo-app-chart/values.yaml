@@ -16,7 +16,7 @@ redis:
   replicaCount: 1
   image:
     repository: redis
-    tag: v20250808111002
+    tag: latest
   service:
     port: 6379
     targetPort: 6379

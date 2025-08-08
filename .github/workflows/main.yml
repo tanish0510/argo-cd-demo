@@ -69,6 +69,15 @@ jobs:
           
       - name: Commit the changes
         run: |
+          # Install yq, a lightweight and portable YAML processor
+          YQ_VERSION=v4.35.2
+          YQ_BINARY="yq_linux_amd64"
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O /usr/bin/yq && chmod +x /usr/bin/yq
+          
+          # Update only the 'python.image.tag' in values.yaml using yq
+          yq e '.python.image.tag = "${{ env.VERSION }}"' -i demo-app-chart/values.yaml
+          
+          # Git commands to commit and push the change
           git config --global user.email "<>"
           git config --global user.name "GitHub Actions Bot"
           git add demo-app-chart/values.yaml
