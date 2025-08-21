@@ -3,7 +3,7 @@ python:
   replicaCount: 2
   image:
     repository: tanish0510/demo-app
-    tag: v20250811115527
+    tag: v20250821113035
   service:
     type: NodePort
     port: 5000
