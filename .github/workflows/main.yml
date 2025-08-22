@@ -12,68 +12,79 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Setting up environment
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
+      # Checkout application repo
+      - name: Checkout App Code
+        uses: actions/checkout@v3
+
+      # Checkout Helm chart repo into subdir
       - name: Checkout Helm Chart repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          repository: tanish0510/argo-cd-demo 
-          path: .
-          
+          repository: tanish0510/argo-cd-demo
+          path: helm-repo
+
+      # Setup Python
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
+      # Docker setup
       - name: Docker Setup
         uses: docker/setup-buildx-action@v2
 
+      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install flake8
-          
+
+      # Run linting tests
       - name: Run Linting tests
         run: |
           flake8 --ignore=E501,F401 .
-      
+
+      # Docker login
       - name: Docker Credentials
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+
+      # Generate image version tag
       - name: Docker tag
         id: version
         run: |
           VERSION=v$(date +"%Y%m%d%H%M%S")
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      # Build Docker Image
       - name: Build Docker Image
         run: |
           docker build . -t tanish0510/demo-app:${{ env.VERSION }} 
-    
+
+      # Push Docker Image
       - name: Push Docker Image
         run: |
           docker push tanish0510/demo-app:${{ env.VERSION }}
-          
-      - name: Commit the changes
+
+      # Update Helm values and commit changes
+      - name: Update Helm Chart and Commit
         run: |
-          # Install yq, a lightweight and portable YAML processor
+          # Install yq
           YQ_VERSION=v4.35.2
           YQ_BINARY="yq_linux_amd64"
-          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O /usr/bin/yq && chmod +x /usr/bin/yq
+          wget https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY} -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+          # Update Helm chart values.yaml
+          yq e '.python.image.tag = "${{ env.VERSION }}"' -i helm-repo/demo-app-chart/values.yaml
           
-          # Update only the 'python.image.tag' in values.yaml using yq
-          yq e '.python.image.tag = "${{ env.VERSION }}"' -i demo-app-chart/values.yaml
-          
-          # Git commands to commit and push the change
+          cd helm-repo
           git config --global user.email "<>"
           git config --global user.name "GitHub Actions Bot"
           git add demo-app-chart/values.yaml
-          git commit -m "Update Helm chart with new image version - ${{ env.VERSION }}"
+          git commit -m "Update Helm chart with new image version - ${{ env.VERSION }}" || echo "No changes to commit"
           git remote set-url origin https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/tanish0510/argo-cd-demo.git
           git push origin main
